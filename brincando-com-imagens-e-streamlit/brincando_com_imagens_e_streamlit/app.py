@@ -7,6 +7,17 @@ RED = 0
 GREEN = 1 
 BLUE = 2
 
+def colorlevel(color_qtt, img_aux):
+    level = (256 / color_qtt)
+    for i in range(color_qtt):
+        if i == 0:
+            img_aux[img_aux <= level] = 0
+        elif i == color_qtt - 1:
+            img_aux[img_aux >= (level * i)] = 255
+        else:
+            img_aux[(img_aux > ((i * level) - 1)) & (img_aux < ((i + 1) * level))] = level * i
+
+
 st.write('## Brincando com imagens')
 
 st.sidebar.write('### Configurações')
@@ -22,7 +33,6 @@ if uploaded_file is not None:
 
     image = np.asarray(image_source)
     
-
     col1, col2 = st.columns(2)
 
     with col1:
@@ -40,7 +50,7 @@ if uploaded_file is not None:
         image_gray_corr = np.array(image_gray_corr * pesos, dtype=np.uint8)
         image_gray_corr = np.array(np.sum(image_gray_corr, axis=2), dtype=np.uint8)
 
-        st.write('### tons de cinza')
+        st.write('### Tons de cinza')
         # st.latex(r'''
         #     Y_{linear} = 0.2126R_{linear} 
         #         + 0.7152G_{linear}
@@ -106,27 +116,30 @@ if uploaded_file is not None:
     st.image(image_aux)
 
 
-    # elif(option == 'Transformação em (log)'):
+    if (option == 'Transformação em (log)'):
         
-    #     c = st.sidebar.slider('c', 0, 130, 25)
-    #     if color == 'tons de cinza':
-    #         log_image_arr = c * (np.log(gray_arr + 1))
-    #         image = Image.fromarray(log_image_arr).convert('L')
-    #         # image = Image.fromarray(255 - gray_arr).convert('L') 
-    #     else:
-    #         image[:,:,0] = c * (np.log(image[:,:,0] + 1))
-    #         image[:,:,1] = c * (np.log(image[:,:,1] + 1))
-    #         image[:,:,2] = c * (np.log(image[:,:,2] + 1))
-    #         image = Image.fromarray(image).convert('L')
+        c = st.sidebar.slider('c', 0, 130, 25)
+        if color == 'tons de cinza':
+            log_image_arr = c * (np.log(gray_arr + 1))
+            image = Image.fromarray(log_image_arr).convert('L')
+            # image = Image.fromarray(255 - gray_arr).convert('L') 
+        else:
+            image[:,:,0] = c * (np.log(image[:,:,0] + 1))
+            image[:,:,1] = c * (np.log(image[:,:,1] + 1))
+            image[:,:,2] = c * (np.log(image[:,:,2] + 1))
+            image = Image.fromarray(image).convert('L')
 
-    # image_aux
-    # option = st.sidebar.selectbox(
-    #     'Qual o nível de cores?',
-    #     (2, 4, 8, 16, 32, 64, 128, 192, 256),
-    # )
+    image_aux
+    option = st.sidebar.selectbox(
+        'Qual o nível de cores?',
+        (2, 4, 8, 16, 32, 64, 128, 192, 256),
+    )
 
-    # image_aux = np.copy(image_gray_corr)
+    image_aux = np.copy(image_gray_corr)
+    colorlevel(option, image_aux)
+
     # if option == 2:
+        
     #     image_aux[image_aux > 127] = 255
     #     image_aux[image_aux < 127] = 0
     # elif option == 4:
@@ -142,7 +155,7 @@ if uploaded_file is not None:
     #     image_aux[(image_aux > 95) & (image_aux < 128)] = 96
     #     image_aux[(image_aux > 63) & (image_aux < 96)] = 64
     #     image_aux[(image_aux > 31) & (image_aux < 64)] = 32
-    #     image_aux[image_aux < 32] = 0
+        # image_aux[image_aux < 32] = 0
 
-    # st.image(image_aux)    
+    st.image(image_aux)    
     
